@@ -1,0 +1,53 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+<style>
+    h1 {
+        font-size: 150px;
+        text-align: center;
+        font-family: 'Calibri', Arial, Helvetica, sans-serif;
+    }
+
+</style>
+    <h1 id="h1"> Welcome</h1>
+    <script>
+        function f(){
+            let bgColor = '#'+Math.random().toString(16).substring(2,8);
+            console.log(bgColor);
+            let docColor = textColor(bgColor)
+            document.body.style.backgroundColor = bgColor
+            document.getElementById('h1').style.color = docColor;
+        }
+
+        setInterval(f, 1000);
+
+
+
+
+let textColor = (bg) => {
+    bg = bg.replace('#', '');
+    //check length of string
+    let red = parseInt(bg, 16) >>> 16; // parseInt(bg.substring(0,2), 16);
+    let green = (parseInt(bg, 16) >>> 8) & 255; // parseInt(bg.substring(2,4), 16)
+    let blue = parseInt(bg, 16) & 255; // parseInt(bg.slice(4,6), 16);
+    let intensity = (red * 0.299) + (green * 0.587) + (blue * 0.114);
+    if (intensity > 186) {
+        return '#000000'; //black
+    } else {
+        return '#ffffff'; //white
+    }
+}
+
+log(textColor('#BADA55')); //a bright green
+log(textColor('#F0E68C')); //khaki
+log(textColor('#990000')); //rebeccapurple
+log(textColor('#6495ED')); //cornflowerblue
+
+    </script>
+
+</body>
+</html>

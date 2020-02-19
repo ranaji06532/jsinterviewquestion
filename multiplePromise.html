@@ -1,0 +1,101 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <script>
+
+/**
+ * MultipleApiCallsHandler is a constructor function
+ * @param {Object} : config
+ * config = { callOnAdd: boolean, errorHandler: function }
+ */
+
+ function MultipleApiCallsHandler(config) {
+    let data = [];
+    this.callOnAdd = config ? config.callOnAdd : false;
+    this.errorHandler = config ? config.errorHandler : () => {};
+  
+    /**
+     * add passed data to the local data object
+     * @param {Object} : _data
+     * _data = { key: string, promiseFunction: function => Promise(), onSuccess: function, onError: function }
+     */
+  
+    this.addApi = _data => {
+      data.push(_data);
+      if (this.callOnAdd) {
+        makeApiCall({ ..._data, key: _data.key || data.length });
+      }
+    };
+  
+    /**
+     * call all the added apis at once
+     */
+  
+    this.callAll = () => {
+      if (this.callOnAdd) {
+        return;
+      }
+      for (let i in data) {
+        makeApiCall({ ...data[i], key: data[i].key || i }, this.errorHandler);
+      }
+    };
+  
+    let makeApiCall = data => {
+      let { key, promiseFunction, onSuccess = () => {}, onError } = data;
+      promiseFunction()
+        .then(data => onSuccess(data, key))
+        .catch(err => {
+          if (onError) {
+            onError(err, key);
+            return;
+          }
+          this.errorHandler(err, key);
+        });
+    };
+  }
+  
+  
+  //  ====================   EXAMPLE  ==========================
+  
+  
+  const makeMultipleCall = () => {
+    let handler = new MultipleApiCallsHandler({
+      errorHandler: () => {
+        console.log(" error in");
+      }
+    });
+    handler.addApi({
+      promiseFunction: () => fetch("https://reqres.in/api/products/3"),
+      onSuccess: (data, key) => {
+        console.log(" data set ", data, key);
+      },
+      key: "3"
+    });
+  
+    handler.addApi({
+      promiseFunction: () => fetch("https://reqres.in/api/products/2"),
+      onSuccess: (data, key) => {
+        console.log(" data set ", data, key);
+      },
+      key: "2"
+    });
+  
+    handler.addApi({
+      promiseFunction: () => fetch("https://reqres.in/api/products/1"),
+      onSuccess: (data, key) => {
+        console.log(" data set ", data, key);
+      },
+      key: "1"
+    });
+  
+    handler.callAll();
+  };
+  
+  makeMultipleCall()
+    </script>
+</body>
+</html>
